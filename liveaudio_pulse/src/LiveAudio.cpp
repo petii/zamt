@@ -225,7 +225,7 @@ void LiveAudio::Initialize(const ModuleCenter* mc) {
                        1;
   log_->LogMessage("Queue capacity: ", queue_capacity, " packets");
 
-  sample_buffer_ = new StereoSample[submit_buffer_size_];
+  sample_buffer_ = new StereoSample[static_cast<unsigned long>(submit_buffer_size_)];
   assert(sample_buffer_);
 
   Core& core = mc_->Get<Core>();
