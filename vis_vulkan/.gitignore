@@ -1,0 +1,4 @@
+
+# Compiled Vulkan shaders
+*.spv
+

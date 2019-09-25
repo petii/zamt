@@ -4,7 +4,7 @@ set(zamt_modules
   core
   liveaudio_pulse
   vis_gtk
-  # vis_vulkan
+  vis_vulkan
 )
 
 
