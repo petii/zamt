@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.12)
+
+project(bsc-thesis)
+
+set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
+message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
+set(APPLICATION_NAME vulkvis)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(SHADER_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/share/${APPLICATION_NAME}/shaders)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+message(STATUS "Installation path: ${CMAKE_INSTALL_PREFIX}")
+
+set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
+# add_subdirectory(${PROJECT_ROOT}/app)
+add_subdirectory(${PROJECT_ROOT}/src)
+
+# install(TARGETS app)
+
+option(BUILD_SHARED_LIBS ON)
+
+include(InstallRequiredSystemLibraries)
+# set (CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/License.txt)
+# set (CPACK_PACKAGE_VERSION_MAJOR "${Tutorial_VERSION_MAJOR}")
+# set (CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
+set(CPACK_PACKAGE_CONTACT "petike997+${APPLICATION_NAME}@gmail.com")
+
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-program-options1.62.0, libglfw3, libvulkan1, libfftw3-3, libboost-filesystem1.62.0, libportaudiocpp0, python3"
+)
+
+include (CPack)

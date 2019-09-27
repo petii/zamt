@@ -7,3 +7,8 @@ set(modules
 )
 AddExe(zamtdemo "${modules}")
 
+set(vis_vulk_modules
+  vis_vulkan
+)
+AddExe(vis_vulk "${vis_vulk_modules}")
+set_property(TARGET vis_vulk PROPERTY CXX_STANDARD 17)

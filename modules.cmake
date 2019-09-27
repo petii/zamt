@@ -25,8 +25,8 @@ if(vis_gtk_on GREATER -1)
   pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 endif()
 
-# If missing:
 list(FIND zamt_modules vis_vulkan vis_vulkan_on)
 if (vis_vulkan_on GREATER -1)
-
+# If missing: sudo apt install libboost-all-dev
+  find_package(Boost REQUIRED program_options)
 endif()
