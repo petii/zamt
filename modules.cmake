@@ -28,5 +28,5 @@ endif()
 list(FIND zamt_modules vis_vulkan vis_vulkan_on)
 if (vis_vulkan_on GREATER -1)
 # If missing: sudo apt install libboost-all-dev
-  find_package(Boost REQUIRED program_options)
+  # find_package(Boost REQUIRED program_options)
 endif()

@@ -1,5 +1,6 @@
 set(module_cpps
-  main.cpp
+  # main.cpp
+  VulkanVisualizer.cpp
 )
 
 
