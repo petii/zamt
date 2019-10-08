@@ -9,6 +9,8 @@
 
 #include <glibmm/main.h>
 
+#include <gdk/gdkx.h>
+
 namespace zamt {
 
 const char* Visualization::kModuleLabel = "vis_gtk";
@@ -100,6 +102,11 @@ void Visualization::Window::OpenWindow(
   canvas_->show();
   canvas_->signal_draw().connect(
       sigc::mem_fun(this, &Visualization::Window::OnDraw), false);
+
+  auto gdkWindow = window_->get_window();
+  auto gdkDisplay = gdkWindow->get_display();
+  gdk_x11_window_get_xid(gdkWindow->gobj());
+  gdk_x11_display_get_xdisplay(gdkDisplay->gobj());
 }
 
 void Visualization::Window::CloseWindow(
