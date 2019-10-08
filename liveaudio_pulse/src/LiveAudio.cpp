@@ -225,7 +225,8 @@ void LiveAudio::Initialize(const ModuleCenter* mc) {
                        1;
   log_->LogMessage("Queue capacity: ", queue_capacity, " packets");
 
-  sample_buffer_ = new StereoSample[static_cast<unsigned long>(submit_buffer_size_)];
+  sample_buffer_ =
+      new StereoSample[static_cast<unsigned long>(submit_buffer_size_)];
   assert(sample_buffer_);
 
   Core& core = mc_->Get<Core>();
@@ -276,7 +277,8 @@ void LiveAudio::RunMainLoop() {
     assert(err >= 0);
     err = pa_mainloop_poll(mainloop_);
     assert(err >= 0);
-    pa_mainloop_dispatch(mainloop_);
+    err = pa_mainloop_dispatch(mainloop_);
+    assert(err >= 0);
   }
 
   log_->LogMessage("Audio mainloop stopping...");
@@ -324,10 +326,8 @@ void LiveAudio::OpenStream(const char* source_name) {
   pa_stream_flags_t flags = (pa_stream_flags_t)(
       PA_STREAM_AUTO_TIMING_UPDATE | PA_STREAM_INTERPOLATE_TIMING |
       PA_STREAM_NOT_MONOTONIC | PA_STREAM_ADJUST_LATENCY);
-  int err;
-  err = pa_stream_connect_record(stream_, source_name, &buffer_attr, flags);
+  int err = pa_stream_connect_record(stream_, source_name, &buffer_attr, flags);
   assert(err == 0);
-  (void)err;
 }
 
 void LiveAudio::ProcessFragment(StereoSample* buffer, int samples) {
