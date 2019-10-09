@@ -4,45 +4,49 @@
 #include <complex>
 #include <vector>
 
+#include "zamt/core/CLIParameters.h"
+#include "zamt/core/Log.h"
 #include "zamt/core/Module.h"
 #include "zamt/core/ModuleCenter.h"
 #include "zamt/core/Scheduler.h"
 
 namespace zamt {
 
-namespace detail {
-template <typename T>
-struct FourierTransformModule : public Module {
-  FourierTransformModule(int, const char* const*) {}
-  void Initialize(const ModuleCenter*) {}
+namespace dft_fftw_internal {
+struct SubscriptionInfo {
+  Scheduler::SourceId source_id;
+  int subscription_id;
 };
-}  // namespace detail
+}  // namespace dft_fftw_internal
+
+using namespace std::string_literals;
 
 template <typename T>
-class FourierTransform {
+class FourierTransform : public Module {
+  std::string module_name;
+
  public:
-  using input_t = std::vector<T>;
-  using output_t = std::vector<std::complex<T>>;
+  using Input = std::vector<T>;
+  using Output = std::vector<std::complex<T>>;
 
-  FourierTransform(Scheduler& scheduler, Scheduler::SourceId input_source_id)
-      : subscription_info{input_source_id, 0},
-        output_source_id(static_cast<Scheduler::SourceId>(
-            ModuleCenter::GetId<detail::FourierTransformModule<T>>())),
-        scheduler(scheduler) {}
-
-  Scheduler::SourceId getSourceId() const { return output_source_id; }
-
+  FourierTransform(int argc, const char* const* argv)
+      : module_name("dft_fftw"s + "<"s + typeid(T).name() + ">"s),
+        cli(argc, argv),
+        logger(module_name.c_str(), cli) {
+    logger.LogMessage("Starting...");
+  }
   ~FourierTransform() {}
 
+  void Initialize(const ModuleCenter* module_center) {
+    logger.LogMessage(
+        std::to_string(module_center->GetId<FourierTransform<T>>()).c_str());
+  }
+
+  int AddInputSource(Scheduler::SourceId /*source_id*/){};
+
  private:
-  struct {
-    Scheduler::SourceId source_id;
-    int subscription_id;
-  } subscription_info;
-
-  Scheduler::SourceId output_source_id;
-
-  Scheduler& scheduler;
+  CLIParameters cli;
+  Log logger;
 };
 
 }  // namespace zamt

@@ -1,5 +1,7 @@
 #include "zamt/vis_vulkan/VulkanVisualizer.h"
 
+#include <type_traits>
+
 #include "zamt/core/Core.h"
 #include "zamt/core/Log.h"
 #include "zamt/core/ModuleCenter.h"
@@ -32,7 +34,7 @@ void VulkanVisualizer::Initialize(const ModuleCenter* moduleCenter) {
   // get the core module handle (mainly for the scheduler)
   auto& core = moduleCenter->Get<Core>();
   logger.LogMessage(core.kModuleLabel);
-  auto& scheduler = core.scheduler();
+  // auto& scheduler = core.scheduler();
   // logger.LogMessage(std::to_string(scheduler.GetNumberOfWorkers()).c_str());
 
   // get the pulseaudio module id
@@ -44,8 +46,16 @@ void VulkanVisualizer::Initialize(const ModuleCenter* moduleCenter) {
   vis.OpenWindow("asd", 123, 234, id);
 
   // now the fun part
-  FourierTransform<int> ft{scheduler, audio};
-  logger.LogMessage(std::to_string(ft.getSourceId()).c_str());
+  auto& ft = moduleCenter->Get<FourierTransform<int>>();
+  logger.LogMessage(
+      std::to_string(
+          moduleCenter->GetId<std::remove_reference_t<decltype(ft)>>())
+          .c_str());
+  auto& ft2 = moduleCenter->Get<FourierTransform<float>>();
+  logger.LogMessage(
+      std::to_string(
+          moduleCenter->GetId<std::remove_reference_t<decltype(ft2)>>())
+          .c_str());
 }
 
 void VulkanVisualizer::PrintHelp() {
