@@ -5,6 +5,7 @@ set(zamt_modules
   liveaudio_pulse
   vis_gtk
   vis_vulkan
+  dft_fftw
 )
 
 

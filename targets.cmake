@@ -5,6 +5,7 @@ set(modules
   liveaudio_pulse
   vis_gtk
   vis_vulkan
+  dft_fftw
 )
 AddExe(zamtdemo "${modules}")
 set_property(TARGET zamtdemo PROPERTY CXX_STANDARD 17)
