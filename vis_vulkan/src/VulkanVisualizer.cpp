@@ -35,16 +35,17 @@ void VulkanVisualizer::Initialize(const ModuleCenter* moduleCenter) {
   auto& scheduler = core.scheduler();
   // logger.LogMessage(std::to_string(scheduler.GetNumberOfWorkers()).c_str());
 
-  // get the pulseaudio module handle (for the scheduler id I guess for now)
-  auto& audio = moduleCenter->Get<LiveAudio>();
-  logger.LogMessage(BOOLCSTR(audio.WasStarted()));
+  // get the pulseaudio module id
+  auto audio = moduleCenter->GetId<LiveAudio>();
+  logger.LogMessage(std::to_string(audio).c_str());
 
   // get the gtk module handle
   auto& vis = moduleCenter->Get<Visualization>();
   vis.OpenWindow("asd", 123, 234, id);
 
   // now the fun part
-  FourierTransform<int> ft{scheduler, 0, 0};
+  FourierTransform<int> ft{scheduler, audio};
+  logger.LogMessage(std::to_string(ft.getSourceId()).c_str());
 }
 
 void VulkanVisualizer::PrintHelp() {
