@@ -4,6 +4,7 @@ set(modules
   core
   liveaudio_pulse
   vis_gtk
+  dft_fftw
 )
 AddExe(zamtdemo "${modules}")
 
