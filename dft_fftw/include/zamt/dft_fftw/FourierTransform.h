@@ -39,10 +39,13 @@ class FourierTransform : public Module {
       PrintHelp();
       return;
     }
+    should_run_dft.store(true);
   }
   ~FourierTransform() {}
 
   void Initialize(const ModuleCenter* module_center) {
+    if (!should_run_dft) return;
+
     log.Message("Initialize...");
     scheduler = &module_center->Get<Core>().scheduler();
 #ifdef ZAMT_MODULE_LIVEAUDIO_PULSE
@@ -54,15 +57,20 @@ class FourierTransform : public Module {
           scheduler->ReleasePacket(id, packet);
         },
         false, subscriptionId);
+    auto packetSize = scheduler->GetPacketSize(audio);
+    log.Message("packetSize = ", packetSize);
 #endif
     auto id = module_center->GetId<FourierTransform>();
     log.Message("audio source = ", audio, ", self id = ", id);
+    // scheduler->RegisterSource(id, )
   }
 
  private:
   void PrintHelp() { Log::Print("ZAMT Discrete Fourier-transform with FFTW"); }
 
   // dft_fftw::internal::SubscriptionInfo subscription;
+
+  std::atomic_bool should_run_dft{false};
 
   CLIParameters cli;
   Log log;
