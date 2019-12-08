@@ -6,10 +6,11 @@ set(module_cpps
 # 3rd party configuration
 
 set(module_includes
-  # ${GTKMM_INCLUDE_DIRS}
+  ${FFTW3_INCLUDE_DIRS}
 )
 
 set(module_libs
-  # ${GTKMM_LIBRARIES}
+  ${FFTW3_LIBRARIES}
+
 )
 
