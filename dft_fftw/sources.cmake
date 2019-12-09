@@ -11,6 +11,5 @@ set(module_includes
 
 set(module_libs
   ${FFTW3_LIBRARIES}
-
 )
 

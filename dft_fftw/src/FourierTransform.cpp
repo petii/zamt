@@ -4,6 +4,9 @@
 #include <chrono>
 #include <complex>
 
+#include <cassert>
+#include <cstring>
+
 #include <fftw3.h>
 
 namespace zamt {
@@ -61,7 +64,7 @@ auto FFTW_Wrapper::transform() {
   for (auto& item : output) {
     tmp.emplace_back(item[0], item[1]);
   }
-  log.Message(tmp.size());
+  // log.Message(tmp.size());
   return tmp;
 }
 
@@ -97,10 +100,12 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
   log.Message("packetSize = ", packetSize, ", sampleCount = ", sampleCount);
   worker = std::make_unique<internal::FFTW_Wrapper>(sampleCount, log);
 
+  auto self_id = module_center->GetId<FourierTransform>();
+
   scheduler->Subscribe(
       audio,
       [=](auto id, auto packet, auto /*time*/) {
-        log.Message("workpacket recieved");
+        // log.Message("workpacket recieved");
         auto castedPacket =
             reinterpret_cast<const LiveAudio::StereoSample*>(packet);
         internal::input_t transformResult;
@@ -113,12 +118,22 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
         worker->addData(transformResult);
         scheduler->ReleasePacket(id, packet);
         auto result = worker->transform();
+
+        auto resultPacket = reinterpret_cast<std::complex<float>*>(
+            scheduler->GetPacketForSubmission(self_id));
+        assert(resultPacket);
+
+        memcpy(resultPacket, result.data(),
+               sampleCount * sizeof(std::complex<float>));
+        static Scheduler::Time timestamp = 0;
+        scheduler->SubmitPacket(
+            self_id, reinterpret_cast<Scheduler::Byte*>(resultPacket),
+            timestamp++);
       },
       false, subscriptionId);
 #endif
-  auto id = module_center->GetId<FourierTransform>();
-  log.Message("audio source = ", audio, ", self id = ", id);
-  scheduler->RegisterSource(id, sizeof(std::complex<float>),
+  log.Message("audio source = ", audio, ", self id = ", self_id);
+  scheduler->RegisterSource(self_id, sizeof(std::complex<float>),
                             static_cast<int>(sampleCount / 2));
 
   // core.RegisterForQuitEvent([this](auto exit_code) {  });

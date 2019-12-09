@@ -29,7 +29,7 @@ endif()
 # If missing: sudo apt install libfftw3-dev
 list(FIND zamt_modules dft_fftw dft_fftw_on)
 if (dft_fftw_on GREATER -1)
-  pkg_check_modules(FFTW3 REQUIRED fftw3)
+  pkg_check_modules(FFTW3 REQUIRED fftw3f)
 endif()
 
 # If missing:
