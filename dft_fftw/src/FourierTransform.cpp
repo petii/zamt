@@ -64,7 +64,6 @@ auto FFTW_Wrapper::transform() {
   for (auto& item : output) {
     tmp.emplace_back(item[0], item[1]);
   }
-  // log.Message(tmp.size());
   return tmp;
 }
 
@@ -102,39 +101,51 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
 
   auto self_id = module_center->GetId<FourierTransform>();
 
+  worker->addData(internal::input_t(sampleCount));
+  auto test_transform = worker->transform();
+  // auto resultCount = sampleCount / 2 + 1;
+  auto resultCount = test_transform.size();
+
   scheduler->Subscribe(
       audio,
       [=](auto id, auto packet, auto /*time*/) {
-        // log.Message("workpacket recieved");
+        static Scheduler::Time timestamp = 0;
+
         auto castedPacket =
             reinterpret_cast<const LiveAudio::StereoSample*>(packet);
+
         internal::input_t transformResult;
         transformResult.reserve(sampleCount);
         std::transform(castedPacket, castedPacket + sampleCount,
-                       std::back_inserter(transformResult), [](auto sample) {
+                       std::back_inserter(transformResult),
+                       [](LiveAudio::StereoSample sample) {
                          return static_cast<float>(sample.left + sample.right) /
                                 2.0f;
                        });
-        worker->addData(transformResult);
+
         scheduler->ReleasePacket(id, packet);
+
+        worker->addData(transformResult);
         auto result = worker->transform();
+        assert(result.size() == resultCount);
 
         auto resultPacket = reinterpret_cast<std::complex<float>*>(
             scheduler->GetPacketForSubmission(self_id));
         assert(resultPacket);
 
         memcpy(resultPacket, result.data(),
-               sampleCount * sizeof(std::complex<float>));
-        static Scheduler::Time timestamp = 0;
+               result.size() * sizeof(std::complex<float>));
+
         scheduler->SubmitPacket(
             self_id, reinterpret_cast<Scheduler::Byte*>(resultPacket),
             timestamp++);
       },
       false, subscriptionId);
-#endif
   log.Message("audio source = ", audio, ", self id = ", self_id);
-  scheduler->RegisterSource(self_id, sizeof(std::complex<float>),
-                            static_cast<int>(sampleCount / 2));
+  scheduler->RegisterSource(
+      self_id, static_cast<int>(sizeof(std::complex<float>) * resultCount),
+      42 /*random number, chosen by 2 fair dice rolls*/);
+#endif
 
   // core.RegisterForQuitEvent([this](auto exit_code) {  });
 }
