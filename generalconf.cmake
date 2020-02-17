@@ -1,6 +1,8 @@
 # global configuration
 
 set(USE_ADDRESS_SANITIZER ON CACHE BOOL "Use -fsanitize=address for leak checking.")
+set(USE_UB_SANITIZER ON CACHE BOOL "Use -fsanitize=undefined for undefined behaviour checking.")
+set(CMAKE_CXX_STANDARD 14)
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_AR gcc-ar)
@@ -41,8 +43,16 @@ function(SetupTarget target_name target_modules)
       target_compile_options(${target_name} PRIVATE $<$<CONFIG:RelWithDebInfo>:-pg>)
     endif()
     if(USE_ADDRESS_SANITIZER)
-      set_target_properties(${target_name} PROPERTIES LINK_FLAGS_DEBUG "-fsanitize=address")
+      list(APPEND sanitizer_list "address")
     endif()
+    if(USE_UB_SANITIZER)
+      list(APPEND sanitizer_list "undefined")
+    endif()
+    list(LENGTH sanitizer_list san_count)
+    if(san_count GREATER 0)
+      list(JOIN sanitizer_list "," sanitizers)
+      set_target_properties(${target_name} PROPERTIES LINK_FLAGS_DEBUG "-fsanitize=${sanitizers}")
+  endif()
     # TODO: remove this if llvm-3.8 or later has LLVMgold.so again
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
       set_target_properties(${target_name} PROPERTIES LINK_FLAGS_RELEASE "-flto")

@@ -33,22 +33,20 @@ struct FFTW_Wrapper {
 
   fftwf_plan plan;
 
-  FFTW_Wrapper(unsigned, Log&);
+  FFTW_Wrapper(unsigned);
   ~FFTW_Wrapper();
 
   void addData(input_t input);
-  auto transform();
-
-  Log& log;
+  void addPartialData(input_t input);
+  output_t transform();
 };
 
-FFTW_Wrapper::FFTW_Wrapper(unsigned sampleSize, Log& log)
+FFTW_Wrapper::FFTW_Wrapper(unsigned sampleSize)
     : size(sampleSize),
       input(size),
       output(size / 2 + 1),
       plan(fftwf_plan_dft_r2c_1d(static_cast<int>(size), input.data(),
-                                 output.data(), FFTW_MEASURE)),
-      log(log) {}
+                                 output.data(), FFTW_MEASURE)) {}
 
 FFTW_Wrapper::~FFTW_Wrapper() { fftwf_destroy_plan(plan); }
 
@@ -57,7 +55,11 @@ void FFTW_Wrapper::addData(input_t data) {
   input = data;
 }
 
-auto FFTW_Wrapper::transform() {
+void FFTW_Wrapper::addPartialData(input_t /*data*/) {
+  // TODO: append to `input`
+}
+
+output_t FFTW_Wrapper::transform() {
   fftwf_execute(plan);
   output_t tmp;
   tmp.reserve(size / 2 + 1);
@@ -97,7 +99,7 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
   size_t sampleCount =
       static_cast<size_t>(packetSize) / sizeof(LiveAudio::StereoSample);
   log.Message("packetSize = ", packetSize, ", sampleCount = ", sampleCount);
-  worker = std::make_unique<internal::FFTW_Wrapper>(sampleCount, log);
+  worker = std::make_unique<internal::FFTW_Wrapper>(sampleCount);
 
   auto self_id = module_center->GetId<FourierTransform>();
 
