@@ -20,4 +20,4 @@ addons:
     - g++-7
     - libpulse-dev
     - libgtkmm-3.0-dev
-
+    - libfftw3-dev
