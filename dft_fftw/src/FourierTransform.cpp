@@ -13,11 +13,6 @@ namespace zamt {
 namespace dft_fftw {
 namespace internal {
 
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 struct fftwf_complex_allocator : std::allocator<fftwf_complex> {
   fftwf_complex* allocate(std::size_t size) {
     return reinterpret_cast<fftwf_complex*>(
@@ -104,7 +99,7 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
   std::size_t sampleCount =
       static_cast<std::size_t>(packetSize) / sizeof(LiveAudio::StereoSample);
   log.Message("packetSize = ", packetSize, ", sampleCount = ", sampleCount);
-  worker = internal::make_unique<internal::FFTW_Wrapper>(sampleCount);
+  worker = std::make_unique<internal::FFTW_Wrapper>(sampleCount);
 
   auto self_id = module_center->GetId<FourierTransform>();
 
@@ -115,8 +110,7 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
 
   scheduler->Subscribe(
       audio,
-      [=](std::size_t id, const Scheduler::Byte* packet,
-          Scheduler::Time /*time*/) {
+      [=](auto id, auto packet, auto /*time*/) {
         static Scheduler::Time timestamp = 0;
 
         auto castedPacket =
