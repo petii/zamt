@@ -3,9 +3,24 @@
 
 #include "zamt/core/CLIParameters.h"
 
+#include <sstream>
+#include <string>
 /// Very simple handling of output to console.
 
 namespace zamt {
+
+namespace internal {
+template <typename Arg>
+void stringify(std::ostream& stream, Arg&& arg) {
+  stream << std::forward<Arg>(arg);
+}
+
+template <typename Arg, typename... Args>
+void stringify(std::ostream& stream, Arg&& arg, Args&&... args) {
+  stream << std::forward<Arg>(arg);
+  stringify(stream, std::forward<Args>(args)...);
+}
+}  // namespace internal
 
 class Log {
  public:
@@ -23,6 +38,13 @@ class Log {
   void LogMessage(const char* msg);
   void LogMessage(const char* msg, int num, const char* suffix = "");
   void LogMessage(const char* msg, float num, const char* suffix = "");
+
+  template <typename... Args>
+  void Message(Args&&... args) {
+    std::ostringstream stream;
+    internal::stringify(stream, std::forward<Args>(args)...);
+    LogMessage(stream.str().c_str());
+  }
 
  private:
   const char* label_;

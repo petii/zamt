@@ -4,6 +4,8 @@ set(zamt_modules
   core
   liveaudio_pulse
   vis_gtk
+  dft_fftw
+  # vis_vulkan
 )
 
 
@@ -24,3 +26,14 @@ if(vis_gtk_on GREATER -1)
   pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 endif()
 
+# If missing: sudo apt install libfftw3-dev
+list(FIND zamt_modules dft_fftw dft_fftw_on)
+if (dft_fftw_on GREATER -1)
+  pkg_check_modules(FFTW3 REQUIRED fftw3f)
+endif()
+
+# If missing:
+list(FIND zamt_modules vis_vulkan vis_vulkan_on)
+if (vis_vulkan_on GREATER -1)
+
+endif()
