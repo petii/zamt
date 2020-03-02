@@ -13,6 +13,11 @@ namespace zamt {
 namespace dft_fftw {
 namespace internal {
 
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 struct fftwf_complex_allocator : std::allocator<fftwf_complex> {
   fftwf_complex* allocate(std::size_t size) {
     return reinterpret_cast<fftwf_complex*>(
@@ -26,14 +31,14 @@ using input_t = std::vector<float>;
 using output_t = std::vector<std::complex<float>>;
 
 struct FFTW_Wrapper {
-  unsigned size;
+  std::size_t size;
 
   input_t input;
   std::vector<fftwf_complex, fftwf_complex_allocator> output;
 
   fftwf_plan plan;
 
-  FFTW_Wrapper(unsigned);
+  FFTW_Wrapper(std::size_t);
   ~FFTW_Wrapper();
 
   void addData(input_t input);
@@ -41,7 +46,7 @@ struct FFTW_Wrapper {
   output_t transform();
 };
 
-FFTW_Wrapper::FFTW_Wrapper(unsigned sampleSize)
+FFTW_Wrapper::FFTW_Wrapper(std::size_t sampleSize)
     : size(sampleSize),
       input(size),
       output(size / 2 + 1),
@@ -96,10 +101,10 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
   subscription = {audio, subscriptionId};
 
   auto packetSize = scheduler->GetPacketSize(audio);
-  size_t sampleCount =
-      static_cast<size_t>(packetSize) / sizeof(LiveAudio::StereoSample);
+  std::size_t sampleCount =
+      static_cast<std::size_t>(packetSize) / sizeof(LiveAudio::StereoSample);
   log.Message("packetSize = ", packetSize, ", sampleCount = ", sampleCount);
-  worker = std::make_unique<internal::FFTW_Wrapper>(sampleCount);
+  worker = internal::make_unique<internal::FFTW_Wrapper>(sampleCount);
 
   auto self_id = module_center->GetId<FourierTransform>();
 
