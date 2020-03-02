@@ -2,6 +2,7 @@
 #define ZAMT_MODULE_FOURIER_TRANSFORM_FFTW_H_
 
 #include <complex>
+#include <memory>
 #include <vector>
 
 #include "zamt/core/CLIParameters.h"
@@ -24,8 +25,6 @@ struct SubscriptionInfo {
 
 struct FFTW_Wrapper;
 }  // namespace internal
-
-using namespace std::string_literals;
 
 class FourierTransform : public Module {
   std::string module_name;

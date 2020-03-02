@@ -74,7 +74,7 @@ output_t FFTW_Wrapper::transform() {
 using clock = std::chrono::high_resolution_clock;
 
 FourierTransform::FourierTransform(int argc, const char* const* argv)
-    : module_name("dft_fftw"s), cli(argc, argv), log(module_name.c_str(), cli) {
+    : module_name("dft_fftw"), cli(argc, argv), log(module_name.c_str(), cli) {
   log.LogMessage("Starting...");
   if (cli.HasParam("-h")) {
     PrintHelp();
@@ -110,7 +110,8 @@ void FourierTransform::Initialize(const ModuleCenter* module_center) {
 
   scheduler->Subscribe(
       audio,
-      [=](auto id, auto packet, auto /*time*/) {
+      [=](std::size_t id, const Scheduler::Byte* packet,
+          Scheduler::Time /*time*/) {
         static Scheduler::Time timestamp = 0;
 
         auto castedPacket =
