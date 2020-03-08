@@ -1,5 +1,8 @@
 # All target apps are configured here (what modules they are built of...)
 
+include(AddTarget)
+include(AddTest)
+
 set(modules
   core
   liveaudio_pulse
@@ -7,4 +10,7 @@ set(modules
   dft_fftw
 )
 AddExe(zamtdemo "${modules}")
+
+# and what/where is zamt_modules?
+AddAllTests("${zamt_modules}")
 
