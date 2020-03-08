@@ -1,4 +1,4 @@
-#include "FourierTransform.h"
+#include "zamt/dft_fftw/FourierTransform.h"
 
 #include <algorithm>
 #include <chrono>

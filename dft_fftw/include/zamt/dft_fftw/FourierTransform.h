@@ -5,14 +5,14 @@
 #include <memory>
 #include <vector>
 
-#include "CLIParameters.h"
-#include "Core.h"
-#include "Log.h"
-#include "Module.h"
-#include "ModuleCenter.h"
-#include "Scheduler.h"
+#include "zamt/core/CLIParameters.h"
+#include "zamt/core/Core.h"
+#include "zamt/core/Log.h"
+#include "zamt/core/Module.h"
+#include "zamt/core/ModuleCenter.h"
+#include "zamt/core/Scheduler.h"
 
-#include "LiveAudio.h"
+#include "zamt/liveaudio_pulse/LiveAudio.h"
 
 namespace zamt {
 
