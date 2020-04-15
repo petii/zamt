@@ -53,7 +53,7 @@ fi
 for TOOLCHAIN_FILE in $(ls -d cmake/toolchain/*); do
   for MODE in $MODES; do
     TOOLCHAIN=$(basename $TOOLCHAIN_FILE "Toolchain.cmake")
-    TOOLCHAIN_FILE=$(realpath $TOOLCHAIN_FILE)
+    TOOLCHAIN_FILE=./$TOOLCHAIN_FILE
     BUILD_DIR="_build_"$TOOLCHAIN"_"$MODE
 
     if [ ! -d $BUILD_DIR ]; then
