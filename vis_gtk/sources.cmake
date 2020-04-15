@@ -5,11 +5,9 @@ set(module_cpps
 
 # 3rd party configuration
 
-set(module_includes
-  ${GTKMM_INCLUDE_DIRS}
-)
+set(module_includes)
 
 set(module_libs
-  ${GTKMM_LIBRARIES}
+  PkgConfig::GTKMM
 )
 

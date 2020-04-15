@@ -8,5 +8,5 @@ include(modules.cmake)
 
 include(targets.cmake)
 
-AddAllTests("${zamt_modules}")
-
+include(FeatureSummary)
+feature_summary(WHAT ALL)

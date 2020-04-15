@@ -1,3 +1,7 @@
+set(module_headers
+  FourierTransform.h
+)
+
 set(module_cpps
   FourierTransform.cpp
 )
@@ -5,11 +9,9 @@ set(module_cpps
 
 # 3rd party configuration
 
-set(module_includes
-  ${FFTW3_INCLUDE_DIRS}
-)
+set(module_includes)
 
 set(module_libs
-  ${FFTW3_LIBRARIES}
+  PkgConfig::FFTW3
 )
 
