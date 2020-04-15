@@ -50,16 +50,17 @@ if [ "$NODEP" != "1" ]; then
   fi
 fi
 
-for COMPILER in $COMPILERS; do
+for TOOLCHAIN_FILE in $(ls -d cmake/toolchain/*); do
   for MODE in $MODES; do
-    BUILD_DIR="_build_"$COMPILER"_"$MODE
+    TOOLCHAIN=$(basename $TOOLCHAIN_FILE "Toolchain.cmake")
+    TOOLCHAIN_FILE=$(realpath $TOOLCHAIN_FILE)
+    BUILD_DIR="_build_"$TOOLCHAIN"_"$MODE
 
     if [ ! -d $BUILD_DIR ]; then
       echo "\\033[1m\\033[37m\\033[42m" Creating new build setup: $BUILD_DIR "\\033[0m"
       mkdir -p $BUILD_DIR
       cd $BUILD_DIR
-      CXXCOMPILER=$( echo $COMPILER | sed "s/gcc/g++/g" | sed "s/clang/clang++/g" )
-      CC=$COMPILER CXX=$CXXCOMPILER cmake -G "$CMAKE_PROJECT" -DCMAKE_BUILD_TYPE=$MODE -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_ADDRESS_SANITIZER=$USEASAN -DUSE_UB_SANITIZER=$USEUBSAN ..
+      cmake -G "$CMAKE_PROJECT" -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=$MODE -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_ADDRESS_SANITIZER=$USEASAN -DUSE_UB_SANITIZER=$USEUBSAN ..
       cd ..
     fi
 
