@@ -1,6 +1,6 @@
 #!/bin/sh
 
-COMPILERS="gcc clang"
+TOOLCHAIN_FILES=$(ls -d cmake/toolchain/*)
 MODES="Debug Release"
 #MODES="Debug Release RelWithDebInfo"
 CMAKE_PROJECT="Ninja"
@@ -9,15 +9,20 @@ CMAKE_PROJECT="Ninja"
 BUILD_DEPS="cmake ninja-build binutils g++ llvm-dev clang clang-format"
 PULSEAUDIO_DEPS="libpulse-dev"
 GTKMM_DEPS="libgtkmm-3.0-dev"
+FFTW_DEPS="libfftw3-dev"
 
-ALL_DEPS="$BUILD_DEPS $PULSEAUDIO_DEPS $GTKMM_DEPS"
+ALL_DEPS="$BUILD_DEPS $PULSEAUDIO_DEPS $GTKMM_DEPS $FFTW_DEPS"
 KEEPGOING=1
 USEASAN=ON
 
 
+
 while [ $# -gt 0 ]; do
   case "$1" in
-    -compilers) shift; COMPILERS="$1" ;;
+    -compilers) shift; TOOLCHAINS="$1" ;;
+    -list-compilers) ls cmake/toolchain/* | xargs -I file basename file Toolchain.cmake
+                     exit 98
+                     ;;
     -k) shift; KEEPGOING="$1" ;;
     -nodep) NODEP=1 ;;
     -noanal) NOANAL=1 ;;
@@ -25,7 +30,8 @@ while [ $# -gt 0 ]; do
     -noubsan) USEUBSAN=OFF ;;
     -v) VERBOSE="-v" ;;
     *) echo "ZAMT build script parameters:"
-       echo "  -compilers <compiler_list>   Tests with the given compiler toolchains."
+       echo "  -compilers <compiler list>   Tests with the given compiler toolchains."
+       echo "  -list-compilers              List the available compiler toolchains"
        echo "  -k <N>                       Wait for N errors before stopping."
        echo "  -nodep                       Skip dependency detection and installation."
        echo "  -noanal                      Skip extra analysis of sources."
@@ -50,10 +56,15 @@ if [ "$NODEP" != "1" ]; then
   fi
 fi
 
-for TOOLCHAIN_FILE in $(ls -d cmake/toolchain/*); do
+for TOOLCHAIN_FILE in $TOOLCHAIN_FILES; do
+  TOOLCHAIN=$(basename $TOOLCHAIN_FILE "Toolchain.cmake")
+  if [ -n TOOLCHAINS ]; then
+    if ! echo $TOOLCHAINS | grep $TOOLCHAIN - ; then
+      continue
+    fi
+  fi
+  TOOLCHAIN_FILE=./$TOOLCHAIN_FILE
   for MODE in $MODES; do
-    TOOLCHAIN=$(basename $TOOLCHAIN_FILE "Toolchain.cmake")
-    TOOLCHAIN_FILE=./$TOOLCHAIN_FILE
     BUILD_DIR="_build_"$TOOLCHAIN"_"$MODE
 
     if [ ! -d $BUILD_DIR ]; then
