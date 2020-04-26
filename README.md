@@ -16,7 +16,17 @@ To install dependencies, on debian-based systems you can use the the [build scri
 
 ### build.sh
 
+When ran without parameters it does the following:
 
+1. Checks and installs required dependencies
+2. Runs multiple build configurations
+3. Runs tests and checks
+
+To get a list of the possible parameters, run:
+
+```console
+$ ./build.sh -h
+```
 
 ### CMake Parameters
 
