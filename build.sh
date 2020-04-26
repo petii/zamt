@@ -12,6 +12,7 @@ GTKMM_DEPS="libgtkmm-3.0-dev"
 FFTW_DEPS="libfftw3-dev"
 
 ALL_DEPS="$BUILD_DEPS $PULSEAUDIO_DEPS $GTKMM_DEPS $FFTW_DEPS"
+ONLYDEP=0
 KEEPGOING=1
 USEASAN=ON
 
@@ -24,6 +25,7 @@ while [ $# -gt 0 ]; do
                      exit 98
                      ;;
     -k) shift; KEEPGOING="$1" ;;
+    -check-dependencies) ONLYDEP=1 ;;
     -nodep) NODEP=1 ;;
     -noanal) NOANAL=1 ;;
     -noasan) USEASAN=OFF ;;
@@ -33,6 +35,7 @@ while [ $# -gt 0 ]; do
        echo "  -compilers <compiler list>   Tests with the given compiler toolchains."
        echo "  -list-compilers              List the available compiler toolchains"
        echo "  -k <N>                       Wait for N errors before stopping."
+       echo "  -check-dependencies          Exit after dependency detection and installation"
        echo "  -nodep                       Skip dependency detection and installation."
        echo "  -noanal                      Skip extra analysis of sources."
        echo "  -noasan                      Do not use leak checking in containers."
@@ -53,6 +56,9 @@ if [ "$NODEP" != "1" ]; then
   else
     # TODO write commands for other packaging systems
     echo "\\033[1m\\033[37m\\033[41m" This packaging system is not yet supported!!! "\\033[0m" These dependencies should be installed: $ALL_DEPS
+  fi
+  if [ $ONLYDEP ]; then
+    exit 97
   fi
 fi
 
